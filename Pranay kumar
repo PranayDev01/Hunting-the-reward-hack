@@ -1,0 +1,129 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyM+JE5YqZxWeEJxyyRUTEyC",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/PranayDev01/Hunting-the-reward-hack/blob/main/Pranay%20kumar\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "G9cjpafiJvW5",
+        "outputId": "ef188feb-d155-486b-c52e-00d8c45bdeff"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== Reward Hack Detection ===\n",
+            "\n",
+            "Agent behavior:\n",
+            "Chosen action: 20\n",
+            "Flawed reward: 200\n",
+            "Actual goal reward: 0\n",
+            "\n",
+            "⚠️ Potential reward hack detected!\n",
+            "The agent maximized the flawed reward\n",
+            "instead of achieving the intended goal.\n",
+            "\n",
+            "After correcting the reward function:\n",
+            "Chosen action: 10\n",
+            "Actual goal reward: 100\n"
+          ]
+        }
+      ],
+      "source": [
+        "import random\n",
+        "\n",
+        "class Environment:\n",
+        "    def __init__(self):\n",
+        "        self.goal = 10\n",
+        "\n",
+        "    def intended_reward(self, action):\n",
+        "        # Reward for getting close to the actual goal\n",
+        "        return max(0, 100 - abs(self.goal - action) * 10)\n",
+        "\n",
+        "    def flawed_reward(self, action):\n",
+        "        # Bug: rewards large actions regardless of goal achievement\n",
+        "        return action * 10\n",
+        "\n",
+        "\n",
+        "class Agent:\n",
+        "    def __init__(self):\n",
+        "        self.actions = list(range(0, 21))\n",
+        "\n",
+        "    def choose_action(self, reward_function):\n",
+        "        # Select the action with the highest observed reward\n",
+        "        return max(\n",
+        "            self.actions,\n",
+        "            key=reward_function\n",
+        "        )\n",
+        "\n",
+        "\n",
+        "def hunt_reward_hack():\n",
+        "    env = Environment()\n",
+        "    agent = Agent()\n",
+        "\n",
+        "    print(\"=== Reward Hack Detection ===\")\n",
+        "\n",
+        "    # Train/evaluate using the flawed reward\n",
+        "    hacked_action = agent.choose_action(env.flawed_reward)\n",
+        "\n",
+        "    flawed_score = env.flawed_reward(hacked_action)\n",
+        "    actual_score = env.intended_reward(hacked_action)\n",
+        "\n",
+        "    print(\"\\nAgent behavior:\")\n",
+        "    print(f\"Chosen action: {hacked_action}\")\n",
+        "    print(f\"Flawed reward: {flawed_score}\")\n",
+        "    print(f\"Actual goal reward: {actual_score}\")\n",
+        "\n",
+        "    # Basic reward-hack detector\n",
+        "    reward_gap = flawed_score - actual_score\n",
+        "\n",
+        "    if hacked_action != env.goal:\n",
+        "        print(\"\\n⚠️ Potential reward hack detected!\")\n",
+        "        print(\"The agent maximized the flawed reward\")\n",
+        "        print(\"instead of achieving the intended goal.\")\n",
+        "    else:\n",
+        "        print(\"\\nNo reward hack detected.\")\n",
+        "\n",
+        "    # Compare with the intended reward\n",
+        "    safe_action = agent.choose_action(env.intended_reward)\n",
+        "\n",
+        "    print(\"\\nAfter correcting the reward function:\")\n",
+        "    print(f\"Chosen action: {safe_action}\")\n",
+        "    print(f\"Actual goal reward: {env.intended_reward(safe_action)}\")\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    hunt_reward_hack()"
+      ]
+    }
+  ]
+}
